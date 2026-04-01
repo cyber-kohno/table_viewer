@@ -1,0 +1,8 @@
+app/node_modules/
+app/dist/
+app/.svelte-kit/
+app/.vite/
+app/npm-debug.log*
+app/yarn-debug.log*
+app/yarn-error.log*
+app/pnpm-debug.log*

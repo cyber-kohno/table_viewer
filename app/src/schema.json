@@ -1,0 +1,73 @@
+[
+  {
+    "id": "tables",
+    "categoryName": "テーブル",
+    "fetchProgram": "mockFetchTables",
+    "columns": [
+      {
+        "label": "サブシステム",
+        "key": "subsystem",
+        "width": 160
+      },
+      {
+        "label": "定義名",
+        "key": "tableName",
+        "width": 220
+      },
+      {
+        "label": "論理名",
+        "key": "logicalName",
+        "width": 280
+      },
+      {
+        "label": "カラム数",
+        "key": "columnCount",
+        "width": 120
+      }
+    ]
+  },
+  {
+    "id": "columns",
+    "categoryName": "カラム",
+    "fetchProgram": "mockFetchColumns",
+    "columns": [
+      {
+        "label": "テーブル定義名",
+        "key": "tableName",
+        "width": 240
+      },
+      {
+        "label": "カラム定義名",
+        "key": "columnName",
+        "width": 240
+      },
+      {
+        "label": "カラム論理名",
+        "key": "logicalName",
+        "width": 280
+      }
+    ]
+  },
+  {
+    "id": "messages",
+    "categoryName": "メッセージ",
+    "fetchProgram": "mockFetchMessages",
+    "columns": [
+      {
+        "label": "キー",
+        "key": "messageKey",
+        "width": 260
+      },
+      {
+        "label": "メッセージ",
+        "key": "messageText",
+        "width": 420
+      },
+      {
+        "label": "ファイル",
+        "key": "sourceFile",
+        "width": 220
+      }
+    ]
+  }
+]
