@@ -15,8 +15,14 @@
   export let sortKey = '';
   export let sortDirection: 'asc' | 'desc' = 'asc';
   export let onSortChange: (key: string) => void;
+  export let selectedRecord: RecordItem | null = null;
+  export let scrollTop = 0;
+  export let onScrollTopChange: (scrollTop: number) => void;
+  export let onSelectRecord: (record: RecordItem | null) => void;
+  export let onViewportHeightChange: (height: number) => void;
+  export let onCopyRecords: (event: MouseEvent) => void | Promise<void>;
+  export let onShowToast: (message: string, position?: { x: number; y: number }) => void;
 
-  let scrollTop = 0;
   let viewportHeight = 320;
   let bodyViewport: HTMLDivElement | null = null;
   let resizeObserver: ResizeObserver | null = null;
@@ -36,10 +42,29 @@
 
   function syncViewportHeight() {
     viewportHeight = bodyViewport?.clientHeight ?? 320;
+    onViewportHeightChange(viewportHeight);
   }
 
   function handleScroll() {
-    scrollTop = bodyViewport?.scrollTop ?? 0;
+    onScrollTopChange(bodyViewport?.scrollTop ?? 0);
+  }
+
+  async function applyScrollPosition() {
+    if (!bodyViewport) {
+      return;
+    }
+
+    await tick();
+
+    if (!bodyViewport) {
+      return;
+    }
+
+    if (Math.abs((bodyViewport.scrollTop ?? 0) - scrollTop) <= 1) {
+      return;
+    }
+
+    bodyViewport.scrollTo({ top: scrollTop });
   }
 
   function getSortState(columnKey: string) {
@@ -105,10 +130,9 @@
   }
 
   $: if (bodyViewport) {
-    columns;
-    records;
-    scrollTop = 0;
-    bodyViewport.scrollTo({ top: 0 });
+    scrollTop;
+    records.length;
+    void applyScrollPosition();
   }
 
   $: visibleCount = Math.ceil(viewportHeight / rowHeight);
@@ -118,6 +142,34 @@
   $: totalBodyHeight = records.length * rowHeight;
   $: totalTableWidth = columns.reduce((sum, column) => sum + column.width + sortIndicatorWidth, 0);
   $: gridTemplateColumns = columns.map((column) => `${column.width + sortIndicatorWidth}px`).join(' ');
+
+  function isSelected(record: RecordItem) {
+    return selectedRecord === record;
+  }
+
+  function handleRowClick(record: RecordItem) {
+    onSelectRecord(isSelected(record) ? null : record);
+  }
+
+  async function handleCellCopy(value: string | number | undefined, x: number, y: number) {
+    await navigator.clipboard.writeText(String(value ?? ''));
+    onShowToast('Copied cell value.', { x, y });
+  }
+
+  function handleCellContextMenu(event: MouseEvent, value: string | number | undefined) {
+    event.preventDefault();
+    event.stopPropagation();
+    void handleCellCopy(value, event.clientX, event.clientY);
+  }
+
+  function handleRowKeydown(event: KeyboardEvent, record: RecordItem) {
+    if (event.key !== 'Enter' && event.key !== ' ') {
+      return;
+    }
+
+    event.preventDefault();
+    handleRowClick(record);
+  }
 </script>
 
 <svelte:window on:resize={syncViewportHeight} />
@@ -153,7 +205,9 @@
     >
       {#each columns as column}
         <div class:sorted-column={sortKey === column.key} class="table-cell filter-cell">
-          {#if column.key !== '__rowNumber'}
+          {#if column.key === '__rowNumber'}
+            <button class="copy-button" type="button" onclick={(event) => onCopyRecords(event)}>Copy</button>
+          {:else}
             <input
               class="filter-input"
               value={filters[column.key] ?? ''}
@@ -174,11 +228,26 @@
         {#each visibleRows as record, index}
           <div
             class:alternate={(startIndex + index) % 2 === 0}
+            class:selected-row={isSelected(record)}
             class="table-row table-body-row virtual-row"
             style={`grid-template-columns:${gridTemplateColumns}; height:${rowHeight}px; width:${totalTableWidth}px; transform:translateY(${(startIndex + index) * rowHeight}px)`}
+            role="button"
+            tabindex="0"
+            onclick={() => handleRowClick(record)}
+            onkeydown={(event) => handleRowKeydown(event, record)}
           >
             {#each columns as column}
-              <div class:sorted-column={sortKey === column.key} class="table-cell body-cell">
+              <div
+                class:sorted-column={sortKey === column.key}
+                class="table-cell body-cell"
+                role="button"
+                tabindex="-1"
+                oncontextmenu={(event) =>
+                  handleCellContextMenu(
+                    event,
+                    column.key === '__rowNumber' ? startIndex + index + 1 : record[column.key]
+                  )}
+              >
                 {#if column.key === '__rowNumber'}
                   {startIndex + index + 1}
                 {:else}

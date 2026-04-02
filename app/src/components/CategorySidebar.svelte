@@ -4,6 +4,7 @@
   export let categories: CategorySchema[] = [];
   export let activeCategoryId = '';
   export let sidebarWidth = 200;
+  export let isRelationMode = false;
   export let onSelectCategory: (categoryId: string) => void | Promise<void>;
 </script>
 
@@ -13,6 +14,7 @@
     {#each categories as category}
       <button
         class:active={category.id === activeCategoryId}
+        class:relation-active={isRelationMode && category.id === activeCategoryId}
         class="category-button"
         type="button"
         onclick={() => onSelectCategory(category.id)}

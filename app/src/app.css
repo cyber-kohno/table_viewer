@@ -60,7 +60,7 @@ input {
 
 .category-button {
   width: 100%;
-  padding: 12px 14px;
+  padding: 9px 14px;
   border: 1px solid transparent;
   border-radius: 10px;
   background: rgba(148, 163, 184, 0.14);
@@ -78,6 +78,21 @@ input {
 .category-button.active {
   background: #e2e8f0;
   color: #0f172a;
+  font-weight: 700;
+}
+
+.category-button:focus {
+  outline: none;
+}
+
+.category-button:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.category-button.relation-active {
+  background: #fecaca;
+  color: #7f1d1d;
   font-weight: 700;
 }
 
@@ -106,17 +121,75 @@ input {
   border-bottom: 1px solid #e2e8f0;
   font-size: 14px;
   font-weight: 700;
-  color: #334155;
+  color: #7f1d1d;
 }
 
 .summary-separator {
+  color: #7f1d1d;
+}
+
+.history-trail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  margin-left: 22px;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  background: #f4fbff;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.history-separator {
   color: #94a3b8;
+}
+
+.history-category {
+  color: #111827;
+  font-weight: 500;
+}
+
+.history-category.active-history {
+  color: #1d4ed8;
+  font-weight: 800;
+}
+
+.history-values {
+  color: #94a3b8;
+  font-weight: 500;
 }
 
 .table-shell {
   min-height: 0;
   flex: 1;
   overflow: hidden;
+}
+
+.table-footer {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-height: 44px;
+  padding: 8px 14px;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+  overflow-x: auto;
+}
+
+.footer-button {
+  padding: 8px 14px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  background: #fff;
+  color: #334155;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.footer-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .table-scroll-x {
@@ -235,7 +308,40 @@ input {
 }
 
 .filter-cell {
+  justify-content: center;
   padding: 8px 10px;
+}
+
+.copy-button {
+  width: 100%;
+  align-self: center;
+  padding: 5px 10px;
+  border: 1px solid #93c5fd;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
+  color: #1d4ed8;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+
+.copy-button:hover {
+  border-color: #60a5fa;
+  background: linear-gradient(180deg, #dbeafe 0%, #bfdbfe 100%);
+}
+
+.copy-button:active {
+  transform: translateY(1px);
+}
+
+.copy-button:focus {
+  outline: none;
+}
+
+.copy-button:focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 0.24);
+  outline-offset: 1px;
 }
 
 .filter-input {
@@ -281,6 +387,23 @@ input {
   background: #edf4ff;
 }
 
+.table-body-row.selected-row {
+  background: #fef08a;
+  animation: selected-row-pulse 2.2s ease-in-out infinite;
+}
+
+.table-body-row.selected-row .sorted-column {
+  background: #d9f99d;
+}
+
+.table-body-row:focus {
+  outline: none;
+}
+
+.table-body-row:focus-visible {
+  outline: none;
+}
+
 .table-body-row:hover .sorted-column {
   background: #e2edff;
 }
@@ -292,6 +415,15 @@ input {
 .body-cell {
   color: #334155;
   font-size: 14px;
+  cursor: pointer;
+}
+
+.body-cell:focus {
+  outline: none;
+}
+
+.body-cell:focus-visible {
+  outline: none;
 }
 
 .cell-highlight {
@@ -311,6 +443,56 @@ input {
 
 .panel-message.error {
   color: #b91c1c;
+}
+
+.toast {
+  position: fixed;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgba(236, 72, 153, 0.94);
+  color: #fff7fb;
+  font-size: 13px;
+  box-shadow: 0 10px 24px rgba(190, 24, 93, 0.28);
+  z-index: 20;
+  pointer-events: none;
+  transform: translate(12px, 12px);
+  animation: toast-fade 1.5s ease forwards;
+}
+
+@keyframes selected-row-pulse {
+  0% {
+    background: #fef08a;
+  }
+
+  50% {
+    background: #fef9c3;
+  }
+
+  100% {
+    background: #fef08a;
+  }
+}
+
+@keyframes toast-fade {
+  0% {
+    opacity: 0;
+    transform: translate(12px, 18px);
+  }
+
+  12% {
+    opacity: 1;
+    transform: translate(12px, 12px);
+  }
+
+  72% {
+    opacity: 1;
+    transform: translate(12px, 12px);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(12px, 6px);
+  }
 }
 
 @media (max-width: 900px) {
