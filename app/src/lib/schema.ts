@@ -1,4 +1,4 @@
-import type { ViewerData } from '../types';
+import type { CategoryRelation, SchemaColumn, ViewerData } from '../types';
 import { createEmptyViewerData, createExampleViewerData, createMockViewerData } from './viewerData';
 
 function normalizePathname(pathname: string): string {
@@ -29,9 +29,63 @@ export async function getSchema(
   }
 
   if (normalizedPathname === '/xxx') {
-    const v = getQueryParamValue('v', search);
-    return createExampleViewerData(v);
+    // const v = getQueryParamValue('v', search);
+    // return createExampleViewerData(v); 
+
+    return getSchemaFile('test.json');
   }
 
   return createEmptyViewerData();
+}
+
+const getSchemaFile = async (fileName: string): Promise<ViewerData> => {
+
+  const res = await fetch('http://localhost:1209/getFile', {
+    method: "POST",
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      path: `schema/${fileName}`
+    })
+  });
+
+  const def: SchemaDef = JSON.parse(await res.json());
+
+  const schema = def.categories.map(cat => {
+    return {
+      ...cat,
+      fetchRecords: async () => {
+        return getQueryResult(def.dbFile, cat.query)
+      }
+    }
+  });
+  console.log(schema);
+  return schema;
+}
+
+const getQueryResult = async (dbName: string, query: string) => {
+
+  const res = await fetch('http://localhost:1209/select', {
+    method: "POST",
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      name: dbName,
+      sql: query
+    })
+  });
+  return res.json();
+}
+
+type SchemaDef = {
+  dbFile: string;
+  categories: {
+    id: string;
+    categoryName: string;
+    columns: SchemaColumn[];
+    relations: CategoryRelation[];
+    query: string;
+  }[];
 }
