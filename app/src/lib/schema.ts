@@ -1,5 +1,6 @@
 import type { CategoryRelation, SchemaColumn, ViewerData } from '../types';
 import { createEmptyViewerData, createExampleViewerData, createMockViewerData } from './viewerData';
+const PORT=1209;
 
 type HashRoute = {
   pathname: string;
@@ -59,13 +60,14 @@ export async function getSchema(
     if (schema == null || db == null) throw new Error('クエリパラメータが正しくありません。');
     return readSchemaDetail(schema, db);
   }
+  
 
   return createEmptyViewerData();
 }
 
 const readSchemaDetail = async (schemaFile: string, dbFile: string): Promise<ViewerData> => {
 
-  const res = await fetch('http://localhost:1209/getFile', {
+  const res = await fetch(`http://localhost:${PORT}/getFile`, {
     method: "POST",
     headers: {
       'Content-Type': 'application/json'
@@ -91,7 +93,7 @@ const readSchemaDetail = async (schemaFile: string, dbFile: string): Promise<Vie
 
 const readSchema = async (fileName: string): Promise<ViewerData> => {
 
-  const res = await fetch('http://localhost:1209/getFile', {
+  const res = await fetch(`http://localhost:${PORT}/getFile`, {
     method: "POST",
     headers: {
       'Content-Type': 'application/json'
@@ -116,13 +118,13 @@ const readSchema = async (fileName: string): Promise<ViewerData> => {
 }
 
 const getQueryResult = async (dbName: string, query: string) => {
-  const res = await fetch('http://localhost:1209/select', {
+  const res = await fetch(`http://localhost:${PORT}/select`, {
     method: "POST",
     headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      name: dbName,
+      name: `tbldf\\${dbName}`,
       sql: query
     })
   });
