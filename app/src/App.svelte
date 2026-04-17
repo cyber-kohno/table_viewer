@@ -54,19 +54,19 @@
   let toastY = 18;
 
   onMount(() => {
-    const handlePopState = () => {
+    const handleHashChange = () => {
       void loadViewer();
     };
     const handleKeydown = (event: KeyboardEvent) => {
       handleGlobalKeydown(event);
     };
 
-    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('hashchange', handleHashChange);
     window.addEventListener('keydown', handleKeydown);
     void loadViewer();
 
     return () => {
-      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('hashchange', handleHashChange);
       window.removeEventListener('keydown', handleKeydown);
       if (toastTimer) {
         window.clearTimeout(toastTimer);
@@ -95,7 +95,7 @@
 
     try {
       latestCategoryRequestId += 1;
-      const fetchedSchema = await getSchema(window.location.pathname, window.location.search);
+      const fetchedSchema = await getSchema(window.location.hash);
       validateViewerData(fetchedSchema);
       categories = fetchedSchema;
       recordsCache = {};
